@@ -34,6 +34,8 @@
     self.navigationItem.rightBarButtonItem = saveButton;
     
     self.paymentView = [[PKView alloc] initWithFrame:CGRectMake(15, 25, 290, 45)];
+    self.paymentView.highlightTintColor = [UIColor greenColor];
+    self.paymentView.cardIOToken = @"be537e6fc1e843ee83ce0ba8b56fad94";
     self.paymentView.delegate = self;
     
     [self.view addSubview:self.paymentView];
@@ -61,6 +63,16 @@
     
     [[NSUserDefaults standardUserDefaults] setValue:card.last4 forKey:@"card.last4"];
     [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (void)paymentView:(PKView *)paymentView needsScanViewControllerPresented:(CardIOPaymentViewController *)scanViewController
+{
+    [self presentViewController:scanViewController animated:YES completion:nil];
+}
+
+- (void)paymentView:(PKView *)paymentView dismissScanViewController:(CardIOPaymentViewController*)scanViewController
+{
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 @end

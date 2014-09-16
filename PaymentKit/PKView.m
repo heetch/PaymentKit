@@ -25,7 +25,7 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
 #import "PKView.h"
 #import "PKTextField.h"
 
-@interface PKView () <PKTextFieldDelegate> {
+@interface PKView () <PKTextFieldDelegate, CardIOPaymentViewControllerDelegate> {
 @private
     BOOL _isInitialState;
     BOOL _isValidState;
@@ -48,7 +48,6 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
 - (BOOL)cardExpiryShouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)replacementString;
 - (BOOL)cardCVCShouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)replacementString;
 
-@property (nonatomic) UIView *opaqueOverGradientView;
 @property (nonatomic) PKCardNumber *cardNumber;
 @property (nonatomic) PKCardExpiry *cardExpiry;
 @property (nonatomic) PKCardCVC *cardCVC;
@@ -82,33 +81,27 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
     self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, 290, 46);
     self.backgroundColor = [UIColor clearColor];
 
-    UIImageView *backgroundImageView = [[UIImageView alloc] initWithFrame:self.bounds];
-    backgroundImageView.image = [[UIImage imageNamed:@"textfield"]
-            resizableImageWithCapInsets:UIEdgeInsetsMake(0, 8, 0, 8)];
-    [self addSubview:backgroundImageView];
+    UIView *backgroundView = [[UIImageView alloc] initWithFrame:self.bounds];
+    backgroundView.backgroundColor = [UIColor whiteColor];
+    [self addSubview:backgroundView];
 
     self.innerView = [[UIView alloc] initWithFrame:CGRectMake(40, 12, self.frame.size.width - 40, 20)];
     self.innerView.clipsToBounds = YES;
 
     [self setupPlaceholderView];
+    [self setupScanButton];
     [self setupCardNumberField];
     [self setupCardExpiryField];
     [self setupCardCVCField];
 
     [self.innerView addSubview:self.cardNumberField];
-
-    UIImageView *gradientImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 12, 34)];
-    gradientImageView.image = [UIImage imageNamed:@"gradient"];
-    [self.innerView addSubview:gradientImageView];
-
-    self.opaqueOverGradientView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 9, 34)];
-    self.opaqueOverGradientView.backgroundColor = [UIColor colorWithRed:0.9686 green:0.9686
-                                                                   blue:0.9686 alpha:1.0000];
-    self.opaqueOverGradientView.alpha = 0.0;
-    [self.innerView addSubview:self.opaqueOverGradientView];
-
+    UIView *opaqueFillView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 12, 34)];
+    opaqueFillView.backgroundColor = [UIColor whiteColor];
+    [self.innerView addSubview:opaqueFillView];
+    
     [self addSubview:self.innerView];
     [self addSubview:self.placeholderView];
+    [self addSubview:self.scanButton];
 
     [self stateCardNumber];
 }
@@ -124,6 +117,48 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
     clip.frame = CGRectMake(32, 0, 4, 20);
     clip.backgroundColor = [UIColor clearColor].CGColor;
     [self.placeholderView.layer addSublayer:clip];
+}
+
+- (void)setupScanButton
+{
+    self.scanButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    self.scanButton.frame = CGRectMake(247, 3, 40, 40);
+    [self.scanButton setImage:[UIImage imageNamed:@"scanner"] forState:UIControlStateNormal];
+    self.scanButton.tintColor = self.highlightTintColor;
+    [self.scanButton addTarget:self action:@selector(scanButtonShowViewController:)
+              forControlEvents:UIControlEventTouchUpInside];
+}
+
+- (void)scanButtonShowViewController:(id)sender
+{
+    CardIOPaymentViewController *scanViewController = [[CardIOPaymentViewController alloc]
+                                                       initWithPaymentDelegate:self];
+
+    scanViewController.appToken = self.cardIOToken;
+    scanViewController.navigationBarTintColor = self.highlightTintColor;
+    scanViewController.guideColor = self.highlightTintColor;
+    scanViewController.disableManualEntryButtons = YES;
+    scanViewController.collectCVV = NO;
+    [self.delegate paymentView:self needsScanViewControllerPresented:scanViewController];
+}
+
+- (void)userDidCancelPaymentViewController:(CardIOPaymentViewController *)scanViewController
+{
+    [self.delegate paymentView:self dismissScanViewController:scanViewController];
+    [self becomeFirstResponder];
+}
+
+- (void)userDidProvideCreditCardInfo:(CardIOCreditCardInfo *)cardInfo
+             inPaymentViewController:(CardIOPaymentViewController *)scanViewController
+{
+    PKCard *initCard = [[PKCard alloc] init];
+
+    initCard.number = cardInfo.cardNumber;
+    initCard.expMonth = cardInfo.expiryMonth;
+    initCard.expYear = cardInfo.expiryYear % 100;
+    self.card = initCard;
+    [self.delegate paymentView:self dismissScanViewController:scanViewController];
+    [self becomeFirstResponder];
 }
 
 - (void)setupCardNumberField
@@ -334,6 +369,24 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
     [self checkValid];
 }
 
+- (void)setScanButtonHidden:(BOOL)hidden
+{
+    [UIView animateWithDuration:kPKViewPlaceholderViewAnimationDuration delay:0
+                        options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                            if (hidden) {
+                                self.scanButton.layer.opacity = 0.0;
+                                self.scanButton.layer.transform = CATransform3DMakeScale(0.8, 0.8, 0.8);
+                            }
+                            else {
+                                self.scanButton.hidden = NO;
+                                self.scanButton.layer.opacity = 1;
+                                self.scanButton.layer.transform = CATransform3DIdentity;
+                            }
+                        } completion:^(BOOL finished) {
+                            self.scanButton.hidden = hidden;
+                        }];
+}
+
 - (void)setPlaceholderViewImage:(UIImage *)image
 {
     if (![self.placeholderView.image isEqual:image]) {
@@ -373,6 +426,7 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
     } else {
         [self setPlaceholderViewImage:[UIImage imageNamed:@"cvc"]];
     }
+    [self setScanButtonHidden:YES];
 }
 
 - (void)setPlaceholderToCardType
@@ -405,6 +459,7 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
     }
 
     [self setPlaceholderViewImage:[UIImage imageNamed:cardTypeName]];
+    [self setScanButtonHidden:cardType != PKCardTypeUnknown];
 }
 
 #pragma mark - Delegates
@@ -630,6 +685,14 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
 - (BOOL)resignFirstResponder;
 {
     return [self.firstResponderField resignFirstResponder];
+}
+
+#pragma mark - Accessors
+
+- (void)setHighlightTintColor:(UIColor *)highlightTintColor
+{
+    _highlightTintColor = highlightTintColor;
+    self.scanButton.tintColor = highlightTintColor;
 }
 
 @end

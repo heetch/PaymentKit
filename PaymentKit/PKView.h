@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <CardIO/CardIO.h>
 #import "PKCard.h"
 #import "PKCardNumber.h"
 #import "PKCardExpiry.h"
@@ -17,6 +18,8 @@
 @class PKView, PKTextField;
 
 @protocol PKViewDelegate <NSObject>
+- (void)paymentView:(PKView *)paymentView needsScanViewControllerPresented:(CardIOPaymentViewController*)scanViewController;
+- (void)paymentView:(PKView *)paymentView dismissScanViewController:(CardIOPaymentViewController*)scanViewController;
 @optional
 - (void)paymentView:(PKView *)paymentView withCard:(PKCard *)card isValid:(BOOL)valid;
 @end
@@ -24,6 +27,9 @@
 @interface PKView : UIView
 
 - (BOOL)isValid;
+
+@property (nonatomic, copy) NSString *cardIOToken;
+@property (nonatomic, strong) UIColor *highlightTintColor;
 
 @property (nonatomic, readonly) UIView *opaqueOverGradientView;
 @property (nonatomic, readonly) PKCardNumber *cardNumber;
@@ -37,6 +43,7 @@
 @property IBOutlet PKTextField *cardExpiryField;
 @property IBOutlet PKTextField *cardCVCField;
 @property IBOutlet UIImageView *placeholderView;
+@property IBOutlet UIButton    *scanButton;
 @property (nonatomic, weak) id <PKViewDelegate> delegate;
 @property (nonatomic, readwrite) PKCard *card;
 
