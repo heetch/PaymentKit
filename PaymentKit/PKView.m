@@ -139,12 +139,12 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
     scanViewController.guideColor = self.highlightTintColor;
     scanViewController.disableManualEntryButtons = YES;
     scanViewController.collectCVV = NO;
-    [self.delegate paymentView:self needsScanViewControllerPresented:scanViewController];
+    [self.scanDelegate paymentView:self needsScanViewControllerPresented:scanViewController];
 }
 
 - (void)userDidCancelPaymentViewController:(CardIOPaymentViewController *)scanViewController
 {
-    [self.delegate paymentView:self dismissScanViewController:scanViewController];
+    [self.scanDelegate paymentView:self dismissScanViewController:scanViewController];
     [self becomeFirstResponder];
 }
 
@@ -157,7 +157,7 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
     initCard.expMonth = cardInfo.expiryMonth;
     initCard.expYear = cardInfo.expiryYear % 100;
     self.card = initCard;
-    [self.delegate paymentView:self dismissScanViewController:scanViewController];
+    [self.scanDelegate paymentView:self dismissScanViewController:scanViewController];
     [self becomeFirstResponder];
 }
 

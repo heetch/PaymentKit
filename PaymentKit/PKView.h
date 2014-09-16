@@ -18,10 +18,13 @@
 @class PKView, PKTextField;
 
 @protocol PKViewDelegate <NSObject>
-- (void)paymentView:(PKView *)paymentView needsScanViewControllerPresented:(CardIOPaymentViewController*)scanViewController;
-- (void)paymentView:(PKView *)paymentView dismissScanViewController:(CardIOPaymentViewController*)scanViewController;
 @optional
 - (void)paymentView:(PKView *)paymentView withCard:(PKCard *)card isValid:(BOOL)valid;
+@end
+
+@protocol PKViewScanDelegate <NSObject>
+- (void)paymentView:(PKView *)paymentView needsScanViewControllerPresented:(CardIOPaymentViewController*)scanViewController;
+- (void)paymentView:(PKView *)paymentView dismissScanViewController:(CardIOPaymentViewController*)scanViewController;
 @end
 
 @interface PKView : UIView
@@ -45,6 +48,7 @@
 @property IBOutlet UIImageView *placeholderView;
 @property IBOutlet UIButton    *scanButton;
 @property (nonatomic, weak) id <PKViewDelegate> delegate;
+@property (nonatomic, weak) id <PKViewScanDelegate> scanDelegate;
 @property (nonatomic, readwrite) PKCard *card;
 
 @end
