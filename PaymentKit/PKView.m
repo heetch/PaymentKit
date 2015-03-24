@@ -134,7 +134,6 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
     CardIOPaymentViewController *scanViewController = [[CardIOPaymentViewController alloc]
                                                        initWithPaymentDelegate:self];
 
-    scanViewController.appToken = self.cardIOToken;
     scanViewController.navigationBarTintColor = self.highlightTintColor;
     scanViewController.guideColor = self.highlightTintColor;
     scanViewController.disableManualEntryButtons = YES;
