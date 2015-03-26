@@ -19,6 +19,11 @@
 #define kPKViewCardExpiryFieldEndX 84
 #define kPKViewCardCVCFieldEndX 177
 
+#define kNoFocusColor RGB(194, 194, 194)
+#define kInvalidColor RGB(222, 70, 85)
+#define kValidColor RGB(60, 181, 181)
+
+
 static NSString *const kPKLocalizedStringsTableName = @"PaymentKit";
 static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable";
 
@@ -30,6 +35,8 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
     BOOL _isInitialState;
     BOOL _isValidState;
 }
+
+@property (nonatomic, strong, readwrite) UIView *validView;
 
 @property (nonatomic, readonly, assign) UIResponder *firstResponderField;
 @property (nonatomic, readonly, assign) PKTextField *firstInvalidField;
@@ -81,9 +88,16 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
     self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, 290, 46);
     self.backgroundColor = [UIColor clearColor];
 
-    UIView *backgroundView = [[UIImageView alloc] initWithFrame:self.bounds];
-    backgroundView.backgroundColor = [UIColor whiteColor];
-    [self addSubview:backgroundView];
+    self.validView = [[UIImageView alloc] initWithFrame:CGRectMake(self.frame.origin.x, self.frame.size.height - 2.0f, self.frame.size.width, 2.0f)];
+    self.validView.backgroundColor = kNoFocusColor;
+    [self addSubview:self.validView];
+
+
+
+    [self.validView setTranslatesAutoresizingMaskIntoConstraints:NO];
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-0.0-[validView]-0.0-|" options:NSLayoutFormatDirectionLeadingToTrailing metrics:nil views:@{@"validView":self.validView}]];
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[validView(2.0)]-0.0-|" options:NSLayoutFormatDirectionLeadingToTrailing metrics:nil views:@{@"validView":self.validView}]];
+
 
     self.innerView = [[UIView alloc] initWithFrame:CGRectMake(40, 12, self.frame.size.width - 40, 20)];
     self.innerView.clipsToBounds = YES;
@@ -96,7 +110,7 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
 
     [self.innerView addSubview:self.cardNumberField];
     UIView *opaqueFillView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 12, 34)];
-    opaqueFillView.backgroundColor = [UIColor whiteColor];
+    opaqueFillView.backgroundColor = [UIColor clearColor];
     [self.innerView addSubview:opaqueFillView];
     
     [self addSubview:self.innerView];
@@ -166,7 +180,7 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
     self.cardNumberField.delegate = self;
     self.cardNumberField.placeholder = [self.class localizedStringWithKey:@"placeholder.card_number" defaultValue:@"1234 5678 9012 3456"];
     self.cardNumberField.keyboardType = UIKeyboardTypeNumberPad;
-    self.cardNumberField.textColor = DarkGreyColor;
+    self.cardNumberField.textColor = kNoFocusColor;
     self.cardNumberField.font = DefaultBoldFont;
 
     [self.cardNumberField.layer setMasksToBounds:YES];
@@ -178,7 +192,7 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
     self.cardExpiryField.delegate = self;
     self.cardExpiryField.placeholder = [self.class localizedStringWithKey:@"placeholder.card_expiry" defaultValue:@"MM/YY"];
     self.cardExpiryField.keyboardType = UIKeyboardTypeNumberPad;
-    self.cardExpiryField.textColor = DarkGreyColor;
+    self.cardExpiryField.textColor = kNoFocusColor;
     self.cardExpiryField.font = DefaultBoldFont;
 
     [self.cardExpiryField.layer setMasksToBounds:YES];
@@ -190,7 +204,7 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
     self.cardCVCField.delegate = self;
     self.cardCVCField.placeholder = [self.class localizedStringWithKey:@"placeholder.card_cvc" defaultValue:@"CVC"];
     self.cardCVCField.keyboardType = UIKeyboardTypeNumberPad;
-    self.cardCVCField.textColor = DarkGreyColor;
+    self.cardCVCField.textColor = kNoFocusColor;
     self.cardCVCField.font = DefaultBoldFont;
 
     [self.cardCVCField.layer setMasksToBounds:YES];
@@ -596,34 +610,46 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
 {
     if ([self isValid]) {
         _isValidState = YES;
+        self.validView.backgroundColor = kValidColor;
+        self.cardNumberField.textColor = kValidColor;
+        self.cardExpiryField.textColor = kValidColor;
+        self.cardCVCField.textColor = kValidColor;
 
         if ([self.delegate respondsToSelector:@selector(paymentView:withCard:isValid:)]) {
             [self.delegate paymentView:self withCard:self.card isValid:YES];
         }
 
-    } else if (![self isValid] && _isValidState) {
-        _isValidState = NO;
-
-        if ([self.delegate respondsToSelector:@selector(paymentView:withCard:isValid:)]) {
-            [self.delegate paymentView:self withCard:self.card isValid:NO];
+    } else {
+        if (_isValidState) {
+            _isValidState = NO;
+            self.validView.backgroundColor = kInvalidColor;
+            self.cardNumberField.textColor = kInvalidColor;
+            self.cardExpiryField.textColor = kInvalidColor;
+            self.cardCVCField.textColor = kInvalidColor;
+            if ([self.delegate respondsToSelector:@selector(paymentView:withCard:isValid:)]) {
+                [self.delegate paymentView:self withCard:self.card isValid:NO];
+            }
         }
     }
 }
 
 - (void)textFieldIsValid:(UITextField *)textField
 {
-    textField.textColor = DarkGreyColor;
+    textField.textColor = kNoFocusColor;
     [self checkValid];
 }
 
 - (void)textFieldIsInvalid:(UITextField *)textField withErrors:(BOOL)errors
 {
     if (errors) {
-        textField.textColor = RedColor;
+        textField.textColor = kInvalidColor;
+        if ([textField isFirstResponder]) {
+            self.validView.backgroundColor = kInvalidColor;
+        }
     } else {
-        textField.textColor = DarkGreyColor;
+        textField.textColor = kNoFocusColor;
+        self.validView.backgroundColor = kNoFocusColor;
     }
-
     [self checkValid];
 }
 

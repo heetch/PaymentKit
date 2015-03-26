@@ -1,0 +1,7 @@
+platform :ios, '7.0'
+pod 'PaymentKit', :path => '../'
+
+# Tests target
+target :'PaymentKit Test', :exclusive => true do
+pod 'PaymentKit', :path => '../'
+end
