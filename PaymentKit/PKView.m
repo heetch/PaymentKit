@@ -479,6 +479,9 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
 
 - (void)textFieldDidBeginEditing:(UITextField *)textField
 {
+    if (_isInitialState) {
+        self.validView.backgroundColor = kValidColor;
+    }
     if ([textField isEqual:self.cardCVCField]) {
         [self setPlaceholderToCVC];
     } else {
@@ -635,22 +638,30 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
 
 - (void)textFieldIsValid:(UITextField *)textField
 {
-    textField.textColor = kNoFocusColor;
+    textField.textColor = kValidColor;
     [self checkValid];
 }
 
 - (void)textFieldIsInvalid:(UITextField *)textField withErrors:(BOOL)errors
 {
     if (errors) {
-        textField.textColor = kInvalidColor;
         if ([textField isFirstResponder]) {
+            textField.textColor = kInvalidColor;
             self.validView.backgroundColor = kInvalidColor;
         }
     } else {
         textField.textColor = kNoFocusColor;
-        self.validView.backgroundColor = kNoFocusColor;
+        self.validView.backgroundColor = kValidColor;
     }
     [self checkValid];
+}
+
+- (void)textFieldDidEndEditing:(UITextField *)textField {
+    if (self.firstResponderField == nil) {
+        if (self.validView.backgroundColor != kInvalidColor) {
+            self.validView.backgroundColor = kNoFocusColor;
+        }
+    }
 }
 
 #pragma mark -
