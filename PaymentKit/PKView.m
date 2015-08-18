@@ -19,9 +19,9 @@
 #define kPKViewCardExpiryFieldEndX 84
 #define kPKViewCardCVCFieldEndX 177
 
-#define kNoFocusColor RGB(194, 194, 194)
-#define kInvalidColor RGB(222, 70, 85)
-#define kValidColor RGB(60, 181, 181)
+#define kNoFocusColor RGB(174, 174, 174)
+#define kInvalidColor RGB(249, 111, 123)
+#define kValidColor RGB(71, 192, 194)
 
 
 static NSString *const kPKLocalizedStringsTableName = @"PaymentKit";
