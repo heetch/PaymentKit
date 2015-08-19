@@ -34,6 +34,7 @@
     self.navigationItem.rightBarButtonItem = saveButton;
     
     self.paymentView = [[PKView alloc] init];
+    //[[PKView alloc] initWithFont:[UIFont systemFontOfSize:9] fontColor:[UIColor redColor] noFocusColor:[UIColor greenColor] invalidColor:[UIColor yellowColor] validColor:[UIColor redColor] placeholderColor:[UIColor blueColor]];
     self.paymentView.frame = CGRectMake(15, 25, 290, 45);
     self.paymentView.highlightTintColor = [UIColor grayColor];
     self.paymentView.cardIOToken = @"be537e6fc1e843ee83ce0ba8b56fad94";
