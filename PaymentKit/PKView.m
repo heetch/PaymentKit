@@ -42,6 +42,12 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
 @property (nonatomic, readonly, assign) PKTextField *firstInvalidField;
 @property (nonatomic, readonly, assign) PKTextField *nextFirstResponder;
 
+@property (nonatomic, readwrite, strong) UIColor *placeholderColor;
+@property (nonatomic, readwrite, strong) UIColor *noFocusColor;
+@property (nonatomic, readwrite, strong) UIColor *invalidColor;
+@property (nonatomic, readwrite, strong) UIColor *validColor;
+@property (nonatomic, readwrite, strong) UIFont *viewFont;
+
 - (void)setup;
 - (void)setupPlaceholderView;
 - (void)setupCardNumberField;
@@ -65,9 +71,22 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
 
 @implementation PKView
 
-- (id)initWithFrame:(CGRect)frame
+- (id)initWithFont:(UIFont *)font noFocusColor:(UIColor *)noFocusColor invalidColor:(UIColor *)invalidColor validColor:(UIColor *)validColor placeholderColor:(UIColor *)placeholderColor {
+    self = [super init];
+    if (self) {
+        self.viewFont = font;
+        self.noFocusColor = noFocusColor;
+        self.invalidColor = invalidColor;
+        self.validColor = validColor;
+        self.placeholderColor = placeholderColor;
+        [self setup];
+    }
+    return self;
+}
+
+- (id)init
 {
-    self = [super initWithFrame:frame];
+    self = [super init];
     if (self) {
         [self setup];
     }
@@ -82,6 +101,24 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
 
 - (void)setup
 {
+    if (!self.noFocusColor) {
+        self.noFocusColor = kNoFocusColor;
+    }
+    if (!self.invalidColor) {
+        self.invalidColor = kInvalidColor;
+    }
+    if (!self.validColor) {
+        self.validColor = kValidColor;
+    }
+
+    if (!self.viewFont) {
+        self.viewFont = DefaultBoldFont;
+    }
+
+    if (!self.placeholderColor) {
+        self.placeholderColor = [UIColor lightGrayColor];
+    }
+
     _isInitialState = YES;
     _isValidState = NO;
 
@@ -89,7 +126,7 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
     self.backgroundColor = [UIColor clearColor];
 
     self.validView = [[UIImageView alloc] initWithFrame:CGRectMake(self.frame.origin.x, self.frame.size.height - 2.0f, self.frame.size.width, 2.0f)];
-    self.validView.backgroundColor = kNoFocusColor;
+    self.validView.backgroundColor = self.noFocusColor;
     [self addSubview:self.validView];
 
 
@@ -178,11 +215,14 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
 {
     self.cardNumberField = [[PKTextField alloc] initWithFrame:CGRectMake(12, 0, 170, 20)];
     self.cardNumberField.delegate = self;
-    self.cardNumberField.placeholder = [self.class localizedStringWithKey:@"placeholder.card_number" defaultValue:@"1234 5678 9012 3456"];
+    self.cardNumberField.attributedPlaceholder = [[NSAttributedString alloc] initWithString:[self.class localizedStringWithKey:@"placeholder.card_number" defaultValue:@"1234 5678 9012 3456"] attributes:@{NSForegroundColorAttributeName:self.placeholderColor}];
+
+
+
     self.cardNumberField.keyboardType = UIKeyboardTypeNumberPad;
-    self.cardNumberField.textColor = kNoFocusColor;
-    self.cardNumberField.tintColor = kNoFocusColor;
-    self.cardNumberField.font = DefaultBoldFont;
+    self.cardNumberField.textColor = self.noFocusColor;
+    self.cardNumberField.tintColor = self.noFocusColor;
+    self.cardNumberField.font = self.viewFont;
 
     [self.cardNumberField.layer setMasksToBounds:YES];
 }
@@ -191,11 +231,11 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
 {
     self.cardExpiryField = [[PKTextField alloc] initWithFrame:CGRectMake(kPKViewCardExpiryFieldStartX, 0, 60, 20)];
     self.cardExpiryField.delegate = self;
-    self.cardExpiryField.placeholder = [self.class localizedStringWithKey:@"placeholder.card_expiry" defaultValue:@"MM/YY"];
+    self.cardExpiryField.attributedPlaceholder = [[NSAttributedString alloc] initWithString:[self.class localizedStringWithKey:@"placeholder.card_expiry" defaultValue:@"MM/YY"] attributes:@{NSForegroundColorAttributeName:self.placeholderColor}];
     self.cardExpiryField.keyboardType = UIKeyboardTypeNumberPad;
-    self.cardExpiryField.textColor = kNoFocusColor;
-    self.cardExpiryField.tintColor = kNoFocusColor;
-    self.cardExpiryField.font = DefaultBoldFont;
+    self.cardExpiryField.textColor = self.noFocusColor;
+    self.cardExpiryField.tintColor = self.noFocusColor;
+    self.cardExpiryField.font = self.viewFont;
 
     [self.cardExpiryField.layer setMasksToBounds:YES];
 }
@@ -204,11 +244,12 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
 {
     self.cardCVCField = [[PKTextField alloc] initWithFrame:CGRectMake(kPKViewCardCVCFieldStartX, 0, 55, 20)];
     self.cardCVCField.delegate = self;
-    self.cardCVCField.placeholder = [self.class localizedStringWithKey:@"placeholder.card_cvc" defaultValue:@"CVC"];
+    self.cardCVCField.attributedPlaceholder = [[NSAttributedString alloc] initWithString:[self.class localizedStringWithKey:@"placeholder.card_cvc" defaultValue:@"CVC"] attributes:@{NSForegroundColorAttributeName:self.placeholderColor}];
+
     self.cardCVCField.keyboardType = UIKeyboardTypeNumberPad;
-    self.cardCVCField.textColor = kNoFocusColor;
-    self.cardCVCField.tintColor = kNoFocusColor;
-    self.cardCVCField.font = DefaultBoldFont;
+    self.cardCVCField.textColor = self.noFocusColor;
+    self.cardCVCField.tintColor = self.noFocusColor;
+    self.cardCVCField.font = self.viewFont;
 
     [self.cardCVCField.layer setMasksToBounds:YES];
 }
@@ -293,16 +334,16 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
 
 #if __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0
     if ([self.cardNumber.formattedString respondsToSelector:@selector(sizeWithAttributes:)]) {
-        NSDictionary *attributes = @{NSFontAttributeName: DefaultBoldFont};
+        NSDictionary *attributes = @{NSFontAttributeName: self.viewFont};
 
         cardNumberSize = [self.cardNumber.formattedString sizeWithAttributes:attributes];
         lastGroupSize = [self.cardNumber.lastGroup sizeWithAttributes:attributes];
     } else {
-        cardNumberSize = [self.cardNumber.formattedString sizeWithFont:DefaultBoldFont];
-        lastGroupSize = [self.cardNumber.lastGroup sizeWithFont:DefaultBoldFont];
+        cardNumberSize = [self.cardNumber.formattedString sizeWithFont:self.viewFont];
+        lastGroupSize = [self.cardNumber.lastGroup sizeWithFont:self.viewFont];
     }
 #else
-    NSDictionary *attributes = @{NSFontAttributeName: DefaultBoldFont};
+    NSDictionary *attributes = @{NSFontAttributeName: self.viewFont};
 
     cardNumberSize = [self.cardNumber.formattedString sizeWithAttributes:attributes];
     lastGroupSize = [self.cardNumber.lastGroup sizeWithAttributes:attributes];
@@ -483,8 +524,8 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
 - (void)textFieldDidBeginEditing:(UITextField *)textField
 {
     if (_isInitialState) {
-        self.validView.backgroundColor = kValidColor;
-        textField.tintColor = kValidColor;
+        self.validView.backgroundColor = self.validColor;
+        textField.tintColor = self.validColor;
     }
     if ([textField isEqual:self.cardCVCField]) {
         [self setPlaceholderToCVC];
@@ -617,14 +658,14 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
 {
     if ([self isValid]) {
         _isValidState = YES;
-        self.validView.backgroundColor = kValidColor;
-        self.cardNumberField.textColor = kValidColor;
-        self.cardExpiryField.textColor = kValidColor;
-        self.cardCVCField.textColor = kValidColor;
+        self.validView.backgroundColor = self.validColor;
+        self.cardNumberField.textColor = self.validColor;
+        self.cardExpiryField.textColor = self.validColor;
+        self.cardCVCField.textColor = self.validColor;
 
-        self.cardNumberField.tintColor = kValidColor;
-        self.cardExpiryField.tintColor = kValidColor;
-        self.cardCVCField.tintColor = kValidColor;
+        self.cardNumberField.tintColor = self.validColor;
+        self.cardExpiryField.tintColor = self.validColor;
+        self.cardCVCField.tintColor = self.validColor;
 
         if ([self.delegate respondsToSelector:@selector(paymentView:withCard:isValid:)]) {
             [self.delegate paymentView:self withCard:self.card isValid:YES];
@@ -633,13 +674,13 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
     } else {
         if (_isValidState) {
             _isValidState = NO;
-            self.validView.backgroundColor = kInvalidColor;
-            self.cardNumberField.textColor = kInvalidColor;
-            self.cardExpiryField.textColor = kInvalidColor;
-            self.cardCVCField.textColor = kInvalidColor;
-            self.cardNumberField.tintColor = kInvalidColor;
-            self.cardExpiryField.tintColor = kInvalidColor;
-            self.cardCVCField.tintColor = kInvalidColor;
+            self.validView.backgroundColor = self.invalidColor;
+            self.cardNumberField.textColor = self.invalidColor;
+            self.cardExpiryField.textColor = self.invalidColor;
+            self.cardCVCField.textColor = self.invalidColor;
+            self.cardNumberField.tintColor = self.invalidColor;
+            self.cardExpiryField.tintColor = self.invalidColor;
+            self.cardCVCField.tintColor = self.invalidColor;
             if ([self.delegate respondsToSelector:@selector(paymentView:withCard:isValid:)]) {
                 [self.delegate paymentView:self withCard:self.card isValid:NO];
             }
@@ -649,7 +690,7 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
 
 - (void)textFieldIsValid:(UITextField *)textField
 {
-    textField.textColor = kValidColor;
+    textField.textColor = self.validColor;
     [self checkValid];
 }
 
@@ -657,22 +698,22 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
 {
     if (errors) {
         if ([textField isFirstResponder]) {
-            textField.textColor = kInvalidColor;
-            textField.tintColor = kInvalidColor;
-            self.validView.backgroundColor = kInvalidColor;
+            textField.textColor = self.invalidColor;
+            textField.tintColor = self.invalidColor;
+            self.validView.backgroundColor = self.invalidColor;
         }
     } else {
-        textField.textColor = kNoFocusColor;
-        textField.tintColor = kNoFocusColor;
-        self.validView.backgroundColor = kValidColor;
+        textField.textColor = self.noFocusColor;
+        textField.tintColor = self.noFocusColor;
+        self.validView.backgroundColor = self.validColor;
     }
     [self checkValid];
 }
 
 - (void)textFieldDidEndEditing:(UITextField *)textField {
     if (self.firstResponderField == nil) {
-        if (self.validView.backgroundColor != kInvalidColor) {
-            self.validView.backgroundColor = kNoFocusColor;
+        if (self.validView.backgroundColor != self.invalidColor) {
+            self.validView.backgroundColor = self.noFocusColor;
         }
     }
 }

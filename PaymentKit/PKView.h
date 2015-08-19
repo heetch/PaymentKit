@@ -31,6 +31,8 @@
 
 - (BOOL)isValid;
 
+- (id)initWithFont:(UIFont *)font noFocusColor:(UIColor *)noFocusColor invalidColor:(UIColor *)invalidColor validColor:(UIColor *)validColor placeholderColor:(UIColor *)placeholderColor;
+
 @property (nonatomic, copy) NSString *cardIOToken;
 @property (nonatomic, strong) UIColor *highlightTintColor;
 

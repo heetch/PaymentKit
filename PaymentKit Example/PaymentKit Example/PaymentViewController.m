@@ -33,7 +33,8 @@
     saveButton.enabled = NO;
     self.navigationItem.rightBarButtonItem = saveButton;
     
-    self.paymentView = [[PKView alloc] initWithFrame:CGRectMake(15, 25, 290, 45)];
+    self.paymentView = [[PKView alloc] init];
+    self.paymentView.frame = CGRectMake(15, 25, 290, 45);
     self.paymentView.highlightTintColor = [UIColor grayColor];
     self.paymentView.cardIOToken = @"be537e6fc1e843ee83ce0ba8b56fad94";
     self.paymentView.delegate = self;
