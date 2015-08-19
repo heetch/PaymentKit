@@ -708,8 +708,8 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
             self.validView.backgroundColor = self.invalidColor;
         }
     } else {
-        textField.textColor = self.noFocusColor;
-        textField.tintColor = self.noFocusColor;
+        textField.textColor = self.fontColor;
+        textField.tintColor = self.fontColor;
         self.validView.backgroundColor = self.validColor;
     }
     [self checkValid];
