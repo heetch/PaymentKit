@@ -54,4 +54,11 @@
 @property (nonatomic, weak) id <PKViewScanDelegate> scanDelegate;
 @property (nonatomic, readwrite) PKCard *card;
 
+@property (nonatomic, readwrite, strong) IBInspectable UIColor *placeholderColor;
+@property (nonatomic, readwrite, strong) IBInspectable UIColor *fontColor;
+@property (nonatomic, readwrite, strong) IBInspectable UIColor *noFocusColor;
+@property (nonatomic, readwrite, strong) IBInspectable UIColor *invalidColor;
+@property (nonatomic, readwrite, strong) IBInspectable UIColor *validColor;
+@property (nonatomic, readwrite, strong) IBInspectable UIFont *viewFont;
+
 @end

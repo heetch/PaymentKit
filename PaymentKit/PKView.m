@@ -42,13 +42,6 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
 @property (nonatomic, readonly, assign) PKTextField *firstInvalidField;
 @property (nonatomic, readonly, assign) PKTextField *nextFirstResponder;
 
-@property (nonatomic, readwrite, strong) UIColor *placeholderColor;
-@property (nonatomic, readwrite, strong) UIColor *fontColor;
-@property (nonatomic, readwrite, strong) UIColor *noFocusColor;
-@property (nonatomic, readwrite, strong) UIColor *invalidColor;
-@property (nonatomic, readwrite, strong) UIColor *validColor;
-@property (nonatomic, readwrite, strong) UIFont *viewFont;
-
 - (void)setup;
 - (void)setupPlaceholderView;
 - (void)setupCardNumberField;
