@@ -783,4 +783,11 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
     self.scanButton.tintColor = highlightTintColor;
 }
 
+- (void)setViewFont:(UIFont *)viewFont {
+    _viewFont = viewFont;
+    self.cardNumberField.font = self.viewFont;
+    self.cardExpiryField.font = self.viewFont;
+    self.cardCVCField.font = self.viewFont;
+}
+
 @end
