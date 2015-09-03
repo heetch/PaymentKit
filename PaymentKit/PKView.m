@@ -123,7 +123,7 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
     self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, 290, 46);
     self.backgroundColor = [UIColor clearColor];
 
-    self.validView = [[UIImageView alloc] initWithFrame:CGRectMake(self.frame.origin.x, self.frame.size.height - 1.0f, self.frame.size.width, 1.0f)];
+    self.validView = [[UIView alloc] initWithFrame:CGRectMake(self.frame.origin.x, self.frame.size.height - 1.0f, self.frame.size.width, 1.0f)];
     self.validView.backgroundColor = self.noFocusColor;
     [self addSubview:self.validView];
 
@@ -131,7 +131,7 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
 
     [self.validView setTranslatesAutoresizingMaskIntoConstraints:NO];
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-0.0-[validView]-0.0-|" options:NSLayoutFormatDirectionLeadingToTrailing metrics:nil views:@{@"validView":self.validView}]];
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[validView(2.0)]-0.0-|" options:NSLayoutFormatDirectionLeadingToTrailing metrics:nil views:@{@"validView":self.validView}]];
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[validView(1.0)]-0.0-|" options:NSLayoutFormatDirectionLeadingToTrailing metrics:nil views:@{@"validView":self.validView}]];
 
 
     self.innerView = [[UIView alloc] initWithFrame:CGRectMake(40, 12, self.frame.size.width - 40, 20)];
