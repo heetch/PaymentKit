@@ -123,7 +123,7 @@ static NSString *const kPKOldLocalizedStringsTableName = @"STPaymentLocalizable"
     self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, 290, 46);
     self.backgroundColor = [UIColor clearColor];
 
-    self.validView = [[UIImageView alloc] initWithFrame:CGRectMake(self.frame.origin.x, self.frame.size.height - 2.0f, self.frame.size.width, 2.0f)];
+    self.validView = [[UIImageView alloc] initWithFrame:CGRectMake(self.frame.origin.x, self.frame.size.height - 1.0f, self.frame.size.width, 1.0f)];
     self.validView.backgroundColor = self.noFocusColor;
     [self addSubview:self.validView];
 
